@@ -2,13 +2,20 @@ package illia.bookshop.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     public List<User> getAllUsers() {
@@ -28,6 +35,21 @@ public class UserService {
     }
 
     public User updateUserById(User user, Long userId) {
+        return null;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByEmail(username);
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        if (user.isPresent()) {
+            authorities.add(new SimpleGrantedAuthority(user.get().getType().toString()));
+
+            return new org.springframework.security.core.userdetails.User(user.get().getEmail(),
+                    user.get().getPassword(), authorities);
+        }
+
         return null;
     }
 }
