@@ -1,5 +1,8 @@
 package illia.bookshop.authentication.login;
 
+import illia.bookshop.order.Order;
+import illia.bookshop.order.OrderRepository;
+import illia.bookshop.order.OrderStatus;
 import illia.bookshop.security.TokenService;
 import illia.bookshop.user.User;
 import illia.bookshop.user.UserRepository;
@@ -12,25 +15,27 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
-import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class LoginService {
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
 
     public ResponseEntity<LoginResponse> handleLogin(LoginRequest loginBody) {
         try {
-            Optional<User> optionalUser = userRepository.findByEmail(loginBody.getEmail());
+            User optionalUser = userRepository.findByUsername(loginBody.getUsername()).orElseThrow();
 
-            if (passwordEncoder.matches(loginBody.getPassword(), optionalUser.get().getPassword())) {
-                LoginResponse loginResponse = new LoginResponse(manageLogin(loginBody.getEmail(), loginBody.getPassword()));
+            if (passwordEncoder.matches(loginBody.getPassword(), optionalUser.getPassword())) {
+                LoginResponse loginResponse = new LoginResponse(manageLogin(loginBody.getUsername(), loginBody.getPassword()));
+                createEmptyCart(optionalUser.getId());
+
                 return new ResponseEntity<>(loginResponse, HttpStatus.OK);
             }
 
@@ -50,5 +55,10 @@ public class LoginService {
             System.out.println("something went wrong");
         }
         return email;
+    }
+
+    private void createEmptyCart(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND));
+        orderRepository.save(new Order(user, OrderStatus.HANDING));
     }
 }

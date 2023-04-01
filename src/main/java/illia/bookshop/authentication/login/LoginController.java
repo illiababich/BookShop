@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/login", produces = "application/json")
+@RequestMapping(path = "/login")
 @AllArgsConstructor
 public class LoginController {
     public final LoginService loginService;
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<LoginResponse> handleLogin(@RequestBody LoginRequest loginBody) {
         return loginService.handleLogin(loginBody);
     }
