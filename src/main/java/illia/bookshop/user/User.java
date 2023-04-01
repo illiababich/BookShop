@@ -19,21 +19,24 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String email;
+    private String username;
     private String password;
+    private String name;
     private UserType type;
     private String address;
     private String zipCode;
     private String phoneNumber;
     private Boolean enabled;
 
-    public User(String email, String password, UserType type, String address, String zipCode, String phoneNumber) {
-        this.email = email;
+    public User(String username, String password, String name, UserType type, String address, String zipCode, String phoneNumber, boolean enabled) {
+        this.username = username;
         this.password = password;
+        this.name = name;
         this.type = type;
         this.address = address;
         this.zipCode = zipCode;
         this.phoneNumber = phoneNumber;
+        this.enabled = enabled;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
