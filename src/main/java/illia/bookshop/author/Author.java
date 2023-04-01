@@ -4,6 +4,7 @@ import illia.bookshop.book.Book;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @Table(name = "AUTHOR")
 @NoArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

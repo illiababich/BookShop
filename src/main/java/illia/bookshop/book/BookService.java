@@ -19,15 +19,13 @@ public class BookService {
         return bookRepository.findById(bookId).orElseThrow(() -> new HttpServerErrorException(HttpStatus.NOT_FOUND));
     }
 
-    public ResponseEntity<Book> createBook(Book book) {
-        bookRepository.save(book);
-        return new ResponseEntity<>(book, HttpStatus.CREATED);
+    public Book createBook(Book book) {
+        return bookRepository.save(book);
     }
 
     public ResponseEntity<String> deleteBookById(Long bookId) {
         try {
-            Optional<Book> book = bookRepository.findById(bookId);
-            bookRepository.delete(book.get());
+            bookRepository.deleteById(bookId);
             return new ResponseEntity<>(String.format("The book with id: %s was deleted successfully.", bookId), HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(String.format("The book with id: %s was not found.", bookId), HttpStatus.NOT_FOUND);
@@ -41,7 +39,14 @@ public class BookService {
     public Book patchBookById(Long bookId, Book bookPatch) {
         Book updatedBook = bookRepository.findById(bookId).map((book) -> book.toBuilder()
                         .bookTitle(Optional.ofNullable(bookPatch.getBookTitle()).orElse(book.getBookTitle()))
+                        .publishDate(Optional.ofNullable(bookPatch.getPublishDate()).orElse(book.getPublishDate()))
+                        .pageNumber(Optional.of(bookPatch.getPageNumber()).orElse(book.getPageNumber()))
+                        .author(Optional.ofNullable(bookPatch.getAuthor()).orElse(book.getAuthor()))
                         .description(Optional.ofNullable(bookPatch.getDescription()).orElse(book.getDescription()))
+                        .genre(Optional.ofNullable(bookPatch.getGenre()).orElse(book.getGenre()))
+                        .price(Optional.of(bookPatch.getPrice()).orElse(book.getPrice()))
+                        .Isbn(Optional.ofNullable(bookPatch.getIsbn()).orElse(book.getIsbn()))
+                        .availableQuantity(Optional.of(bookPatch.getAvailableQuantity()).orElse(book.getAvailableQuantity()))
                         .build())
                 .orElseThrow(() -> new HttpClientErrorException(
                         HttpStatus.NOT_FOUND, String.format("The book with ID: %s not found.", bookId)));

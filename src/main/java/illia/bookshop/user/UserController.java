@@ -1,6 +1,7 @@
 package illia.bookshop.user;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,8 @@ public class UserController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<String> createUser(@RequestBody User user) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
